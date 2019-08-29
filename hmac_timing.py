@@ -2,10 +2,14 @@
 
 from Crypto.Hash import HMAC
 
-secret = b'toomanysecrets'
-message = b'hihello'
+SECRET = b'toomanysecrets'
+MESSAGE = b'hihello'
 
-h = HMAC.new(secret)
-h.update(message)
-print(h.hexdigest())
+def compute_hmac(secret, message):
+    h = HMAC.new(secret)
+    h.update(message)
+    return h.hexdigest()
+
+if __name__ == '__main__':
+    print(compute_hmac(SECRET, MESSAGE))
 
