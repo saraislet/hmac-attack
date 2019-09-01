@@ -35,12 +35,20 @@ def constant_time_compare(a, b):
     return compare
 
 def compute_most_likely_char(a, b, pos, sample_size):
-    times = [(0, 0.0)]*256
+    '''Calculate the most likely character in position pos'''
+    times = [(0, 0.0)]*256  # Initialize array of times per value
+    
+    # Try each possible byte (256 options)
     for i in range(256):
         a[pos] = i
+
+        # Set the callable compare, then call it with timeit
         compare = nonconstant_time_compare(a, b)
         result = timeit(compare, timer=clock, number=sample_size)
+
         times[i] = ((i, result))
+
+    # Sort the list of times
     def get_time(t):
         return t[1]
     times.sort(key=get_time, reverse=True)
@@ -55,6 +63,7 @@ def find_actual(actual, sample_size):
     return guess
 
 def print_top(vector, number):
+    '''Print the top number of entries in list vector'''
     for i in range(number):
         print(vector[i])
 
