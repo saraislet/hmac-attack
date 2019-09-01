@@ -2,6 +2,8 @@
 
 #from Crypto.Hash import HMAC
 from timeit import timeit
+from time import clock
+from time import time
 
 SECRET = b'toomanysecrets'
 MESSAGE = bytearray(b'hihello')
@@ -11,36 +13,30 @@ MESSAGE = bytearray(b'hihello')
 #    h.update(message)
 #    return h.hexdigest()
 
-class NonconstantTimeCompare:
-    def __init__(self, a, b):
-        self.a = a
-        self.b = b
+def nonconstant_time_compare(a, b):
+    def compare():
+        return a == b
+    return compare
 
-    def __call__(self):
-        return self.a == self.b
-
-class ConstantTimeCompare:
-    def __init__(self, a, b):
-        if len(a) != len(b):
-            return
-        self.a = a
-        self.b = b
-
-    def __call__(self):
+def constant_time_compare(a, b):
+    if len(a) != len(b):
+        return
+    def compare():
         result = 0
-        for i in range(len(self.a)):
-            result |= self.a[i] ^ self.b[i]
+        for i in range(len(a)):
+            result |= a[i] ^ b[i]
         return result == 0
+    return compare
 
-def ComputeMostLikelyChar(a, b, pos, sample_size):
+def compute_most_likely_char(a, b, pos, sample_size):
     a = bytearray(a)
     b = bytearray(b)
     best = -1
     max_time = 0
     for i in range(256):
         a[pos] = i
-        compare = NonconstantTimeCompare(a, b)
-        result = timeit(compare, number=sample_size)
+        compare = nonconstant_time_compare(a, b)
+        result = timeit(compare, timer=clock, number=sample_size)
         if result > max_time:
             best = i
             max_time = result
@@ -48,10 +44,10 @@ def ComputeMostLikelyChar(a, b, pos, sample_size):
 
 if __name__ == '__main__':
 #    print(compute_hmac(SECRET, MESSAGE))
-    print(NonconstantTimeCompare(bytearray('hihello'), MESSAGE)())
-    print(ConstantTimeCompare(bytearray('hihello'), MESSAGE)())
-    print(NonconstantTimeCompare(bytearray('hyhello'), MESSAGE)())
-    print(ConstantTimeCompare(bytearray('hyhello'), MESSAGE)())
+    print(nonconstant_time_compare(bytearray(b'hihello'), MESSAGE)())
+    print(constant_time_compare(bytearray(b'hihello'), MESSAGE)())
+    print(nonconstant_time_compare(bytearray(b'hyhello'), MESSAGE)())
+    print(constant_time_compare(bytearray(b'hyhello'), MESSAGE)())
     #print(timeit(NonconstantTimeCompare('abcd', 'bcda')))
     #print(timeit(NonconstantTimeCompare('abcd', 'acbd')))
     #print(timeit(NonconstantTimeCompare('abcd', 'abce')))
@@ -60,5 +56,5 @@ if __name__ == '__main__':
     #print(timeit(ConstantTimeCompare('abcd', 'acbd')))
     #print(timeit(ConstantTimeCompare('abcd', 'abce')))
     #print(timeit(ConstantTimeCompare('abcd', 'abcd')))
-    print(ComputeMostLikelyChar('abcd', 'bcda', 0, 1000000))
+    print(compute_most_likely_char(b'abcd', b'bcda', 0, 1000))
 
