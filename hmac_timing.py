@@ -29,18 +29,20 @@ def constant_time_compare(a, b):
     return compare
 
 def compute_most_likely_char(a, b, pos, sample_size):
-    a = bytearray(a)
-    b = bytearray(b)
-    best = -1
-    max_time = 0
+    times = [(0, 0.0)]*256
     for i in range(256):
         a[pos] = i
         compare = nonconstant_time_compare(a, b)
         result = timeit(compare, timer=clock, number=sample_size)
-        if result > max_time:
-            best = i
-            max_time = result
-    return best
+        times[i] = ((i, result))
+    def get_time(t):
+        return t[1]
+    times.sort(key=get_time, reverse=True)
+    return times
+
+def print_top(vector, number):
+    for i in range(number):
+        print(vector[i])
 
 if __name__ == '__main__':
 #    print(compute_hmac(SECRET, MESSAGE))
@@ -56,5 +58,10 @@ if __name__ == '__main__':
     #print(timeit(ConstantTimeCompare('abcd', 'acbd')))
     #print(timeit(ConstantTimeCompare('abcd', 'abce')))
     #print(timeit(ConstantTimeCompare('abcd', 'abcd')))
-    print(compute_most_likely_char(b'abcd', b'bcda', 0, 1000))
+    guess = bytearray(b'abcd')
+    actual = bytearray(b'qwer')
+    times = compute_most_likely_char(guess, actual, 0, 1000000)
+    print(guess[0])
+    print(actual[0])
+    print_top(times, 25)
 
