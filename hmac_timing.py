@@ -1,6 +1,7 @@
 #!bin/python
 
-from Crypto.Hash import HMAC
+import hmac
+from hashlib import sha256
 from datetime import datetime
 import timeit
 from time import clock
@@ -13,8 +14,7 @@ SECRET = b'toomanysecrets'
 MESSAGE = b'hihello'
 
 def compute_hmac(secret, message):
-    h = HMAC.new(secret)
-    h.update(message)
+    h = hmac.new(secret, message, sha256)
     return h.digest() 
 
 def nonconstant_time_compare(a, b):
@@ -45,7 +45,7 @@ def flawed_constant_time_compare(a, b):
     return compare
 
 def constant_time_compare(a, b):
-    if len(a) != len(b)
+    if len(a) != len(b):
         return
     def compare():
         return hmac.compare_digest(a, b)
@@ -116,9 +116,9 @@ if __name__ == '__main__':
     #print(str(datetime.now() - timer) + " Starting non constant time compare timing attack")
     #guess_hex_nc = find_actual(actual, nonconstant_time_compare, 10000, 100, 2, 64, 5).hex()
     #print("Actual is {0}, non constant time compare guess is {1}".format(actual_hex, guess_hex_nc))
-    print(str(datetime.now() - timer) + " Starting flawed constant time compare timing attack")
-    guess_hex_fc = find_actual(actual, flawed_constant_time_compare, 1000, 20, 8, 64, 5).hex()
-    print("Actual is {0}, flawed constant time compare guess is {1}".format(actual_hex, guess_hex_fc))
+    #print(str(datetime.now() - timer) + " Starting flawed constant time compare timing attack")
+    #guess_hex_fc = find_actual(actual, flawed_constant_time_compare, 1000, 20, 8, 64, 5).hex()
+    #print("Actual is {0}, flawed constant time compare guess is {1}".format(actual_hex, guess_hex_fc))
     print(str(datetime.now() - timer) + " Starting constant time compare timing attack")
     guess_hex_c = find_actual(actual, constant_time_compare, 1000, 20, 8, 64, 5).hex()
     print("Actual is {0}, constant time compare guess is {1}".format(actual_hex, guess_hex_c))
