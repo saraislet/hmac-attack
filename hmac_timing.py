@@ -122,5 +122,5 @@ if __name__ == '__main__':
     print(str(datetime.now() - timer) + " Starting constant time compare timing attack")
     guess_hex_c = find_actual(actual, constant_time_compare, 1000, 20, 8, 64, 5).hex()
     print("Actual is {0}, constant time compare guess is {1}".format(actual_hex, guess_hex_c))
-    print(str(datetime.now() - timer) + " Finished constant time compare timing attack"
-)
+    print(str(datetime.now() - timer) + " Finished constant time compare timing attack")
+
