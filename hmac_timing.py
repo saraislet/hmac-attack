@@ -34,7 +34,7 @@ def nonconstant_time_compare_slow(a, b):
         return True
     return compare
 
-def constant_time_compare(a, b):
+def flawed_constant_time_compare(a, b):
     if len(a) != len(b):
         return
     def compare():
@@ -42,6 +42,13 @@ def constant_time_compare(a, b):
         for i in range(len(a)):
             result |= a[i] ^ b[i]
         return result == 0
+    return compare
+
+def constant_time_compare(a, b):
+    if len(a) != len(b)
+        return
+    def compare():
+        return hmac.compare_digest(a, b)
     return compare
 
 def compute_most_likely_char(guess, actual, compare_closure_factory, pos, sample_size, repeat_num):
@@ -84,7 +91,7 @@ def find_actual(actual, compare_closure_factory, sample_size, repeat_num, min_st
         times = list(map(lambda t: t[1], times_and_byte[1:256]))
         mean_time = mean(times)
         stdev_time = stdev(times)
-        stdev_over = (times_and_byte[0][1] - mean_time) / stdev_time
+        stdev_over = (times_and_byte[0][1] - times_and_byte[1][1]) / stdev_time
         print("Guess is {0:02x}, actual is {1:02x}, number of stdev over others is {2:.3f}".format(times_and_byte[0][0], actual[pos], stdev_over))
         if stdev_over < min_stdev or stdev_over > max_stdev:
             print("Unreasonable stdev_over, retry guess!")
@@ -103,14 +110,17 @@ if __name__ == '__main__':
     timer = datetime.now()
     actual = compute_hmac(SECRET, MESSAGE)
     actual_hex = actual.hex()
-    print(str(datetime.now() - timer) + " Starting slow non constant time compare timing attack")
-    guess_hex_nc_slow = find_actual(actual, nonconstant_time_compare_slow, 1000, 20, 8, 64, 5).hex()
-    print("Actual is {0}, Slow non constant time compare guess is {1}".format(actual_hex, guess_hex_nc_slow))
-    print(str(datetime.now() - timer) + " Starting non constant time compare timing attack")
-    guess_hex_nc = find_actual(actual, nonconstant_time_compare, 25000, 100, 8, 64, 5).hex()
-    print("Actual is {0}, non constant time compare guess is {1}".format(actual_hex, guess_hex_nc))
+    #print(str(datetime.now() - timer) + " Starting slow non constant time compare timing attack")
+    #guess_hex_nc_slow = find_actual(actual, nonconstant_time_compare_slow, 1000, 20, 3, 64, 5).hex()
+    #print("Actual is {0}, Slow non constant time compare guess is {1}".format(actual_hex, guess_hex_nc_slow))
+    #print(str(datetime.now() - timer) + " Starting non constant time compare timing attack")
+    #guess_hex_nc = find_actual(actual, nonconstant_time_compare, 10000, 100, 2, 64, 5).hex()
+    #print("Actual is {0}, non constant time compare guess is {1}".format(actual_hex, guess_hex_nc))
+    print(str(datetime.now() - timer) + " Starting flawed constant time compare timing attack")
+    guess_hex_fc = find_actual(actual, flawed_constant_time_compare, 1000, 20, 8, 64, 5).hex()
+    print("Actual is {0}, flawed constant time compare guess is {1}".format(actual_hex, guess_hex_fc))
     print(str(datetime.now() - timer) + " Starting constant time compare timing attack")
-    guess_hex_c = find_actual(actual, constant_time_compare, 50000, 100, 8, 64, 5).hex()
+    guess_hex_c = find_actual(actual, constant_time_compare, 1000, 20, 8, 64, 5).hex()
     print("Actual is {0}, constant time compare guess is {1}".format(actual_hex, guess_hex_c))
-    print(str(datetime.now() - timer) + " Finished non constant time compare timing attack")
+    print(str(datetime.now() - timer) + " Finished constant time compare timing attack")
 
