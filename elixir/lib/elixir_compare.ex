@@ -21,21 +21,3 @@ defmodule ElixirCompare do
   end
 
 end
-
-defmodule Benchmark do 
-
-  def benchmark_compare(a, b) do
-    Benchee.run(%{
-      "compare_same" => fn -> ElixirCompare.nonconstant_compare(a, a) end,
-      "compare_diff" => fn -> ElixirCompare.nonconstant_compare(a, b) end
-    })
-  end
-
-  def benchmark_compare_repeat(a, b, n) do
-    Benchee.run(%{
-      "compare_same" => fn -> ElixirCompare.repeat_compare(a, a, n) end,
-      "compare_diff" => fn -> ElixirCompare.repeat_compare(a, b, n) end
-    })
-  end
-
-end
