@@ -1,11 +1,5 @@
 defmodule ElixirCompare do
-  @moduledoc """
-  ElixirCompare keeps the contexts that define your domain
-  and business logic.
-
-  Contexts are also responsible for managing your data, regardless
-  if it comes from the database, an external API or others.
-  """
+  use Bitwise
   
   def nonconstant_compare(target, guess) when target == guess, do: :ok
 
@@ -18,6 +12,18 @@ defmodule ElixirCompare do
   def repeat_compare(target, guess, count) do
     nonconstant_compare(target, guess)
     repeat_compare(target, guess, count - 1)
+  end
+
+  def constant_time_compare(a, b) do
+    constant_time_compare(a, b, 0)
+  end
+
+  def constant_time_compare(<<firsta, resta::binary>>, <<firstb, restb::binary>>, diff) do
+    constant_time_compare(resta, restb, diff ||| (firsta ^^^ firstb))
+  end
+
+  def constant_time_compare(<<>>, <<>>, diff) do
+    diff == 0
   end
 
 end
