@@ -1,6 +1,7 @@
 #!bin/python
 
 from Crypto.Hash import HMAC
+from datetime import datetime
 import timeit
 from time import clock
 from time import time
@@ -87,7 +88,7 @@ def find_actual(actual, compare_closure_factory, sample_size, repeat_num, min_st
         print("Guess is {0:02x}, actual is {1:02x}, number of stdev over others is {2:.3f}".format(times_and_byte[0][0], actual[pos], stdev_over))
         if stdev_over < min_stdev or stdev_over > max_stdev:
             print("Unreasonable stdev_over, retry guess!")
-            if pos > 0:
+            if pos > 0 and stdev_over < min_stdev:
                 pos -= 1
                 guess_counter = 0
             if guess_counter >  max_guesses:
@@ -99,12 +100,17 @@ def find_actual(actual, compare_closure_factory, sample_size, repeat_num, min_st
             guess_counter = 0
 
 if __name__ == '__main__':
+    timer = datetime.now()
     actual = compute_hmac(SECRET, MESSAGE)
     actual_hex = actual.hex()
+    print(str(datetime.now() - timer) + " Starting slow non constant time compare timing attack")
     guess_hex_nc_slow = find_actual(actual, nonconstant_time_compare_slow, 1000, 20, 8, 64, 5).hex()
     print("Actual is {0}, Slow non constant time compare guess is {1}".format(actual_hex, guess_hex_nc_slow))
-    guess_hex_nc = find_actual(actual, nonconstant_time_compare, 10000, 150, 4, 25, 5).hex()
+    print(str(datetime.now() - timer) + " Starting non constant time compare timing attack")
+    guess_hex_nc = find_actual(actual, nonconstant_time_compare, 25000, 100, 8, 64, 5).hex()
     print("Actual is {0}, non constant time compare guess is {1}".format(actual_hex, guess_hex_nc))
-    guess_hex_c = find_actual(actual, constant_time_compare, 10000, 150, 4, 25, 5).hex()
+    print(str(datetime.now() - timer) + " Starting constant time compare timing attack")
+    guess_hex_c = find_actual(actual, constant_time_compare, 50000, 100, 8, 64, 5).hex()
     print("Actual is {0}, constant time compare guess is {1}".format(actual_hex, guess_hex_c))
+    print(str(datetime.now() - timer) + " Finished non constant time compare timing attack")
 
