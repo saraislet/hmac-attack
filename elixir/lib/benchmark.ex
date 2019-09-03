@@ -25,6 +25,14 @@ defmodule Benchmark do
     })
   end
 
+  def benchmark_compare_constant(a, b, c, n) do
+    IO.puts("Comparing strings: #{a} to #{b} and #{c}.")
+    Benchee.run(%{
+      "compare_ab" => fn -> ElixirCompare.repeat_constant_time_compare(a, b, n) end,
+      "compare_ac" => fn -> ElixirCompare.repeat_constant_time_compare(a, c, n) end,
+    })
+  end
+
   bench_config = [
     time: 1,
     warmup: 0.1,
